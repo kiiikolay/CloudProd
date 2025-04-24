@@ -8,8 +8,13 @@ from loguru import logger
 from cloud import Connector
 from database_connect import sql_req
 
-logger.add(LOG_FILE, format='{level} {time} {file} {function} {line} {message} {exception}',
-           serialize=True, level="INFO", rotation="500 MB")
+logger.add(
+    LOG_FILE,
+    format="{level} {time} {file} {function} {line} {message} {exception}",
+    serialize=True,
+    level="INFO",
+    rotation="500 MB",
+)
 
 
 def get_last_modified_time(file_path):
@@ -25,16 +30,17 @@ def get_last_modified_time(file_path):
     try:
         timestamp = os.path.getmtime(file_path)
         datetime_object = datetime.datetime.fromtimestamp(timestamp)
-        last_modified_time = datetime_object.strftime('%Y-%m-%d %H:%M:%S')
-        logger.debug(f'Время последнего изменения файла {file_path}: {last_modified_time}')
+        last_modified_time = datetime_object.strftime("%Y-%m-%d %H:%M:%S")
+        logger.debug(
+            f"Время последнего изменения файла {file_path}: {last_modified_time}"
+        )
         return last_modified_time
     except FileNotFoundError:
-        logger.warning(f'Файл не найден: {file_path}')
+        logger.warning(f"Файл не найден: {file_path}")
         return None
     except Exception as e:
-        logger.error(f'Ошибка при получении времени изменения файла {file_path}: {e}')
+        logger.error(f"Ошибка при получении времени изменения файла {file_path}: {e}")
         return None
-
 
 
 def download_db(data):
@@ -50,13 +56,13 @@ def download_db(data):
         data (dict): Словарь с данными для записи в базу данных. Ключи - имена файлов, значения - дата и время обновления.
     """
 
-    logger.info('Начало download_db')
+    logger.info("Начало download_db")
     try:
         for key, value in data.items():
             sql_req(func="add", file=key, add_or_update_datetime=value)
-        logger.debug('data успешно сохранен в database.db')
+        logger.debug("data успешно сохранен в database.db")
     except Exception as e:
-        logger.error(f'Ошибка при записи в database.db: {e}')
+        logger.error(f"Ошибка при записи в database.db: {e}")
 
 
 def open_db():
@@ -71,13 +77,14 @@ def open_db():
         dict: Данные, считанные из базы данных, или None в случае ошибки.
     """
 
-    logger.info('Начало open_db')
+    logger.info("Начало open_db")
     try:
         data_db = sql_req(func="read")
         return data_db
     except Exception as e:
-        logger.error(f'Ошибка при чтении db: {e}')
+        logger.error(f"Ошибка при чтении db: {e}")
         return None
+
 
 def clear_db(data_db, list_file):
     """
@@ -97,16 +104,17 @@ def clear_db(data_db, list_file):
         dict: Обновленный словарь `data_db` после очистки.
     """
 
-    logger.info('Начало clear_db')
+    logger.info("Начало clear_db")
     list_deleted = [k for k in data_db if k not in list_file]
 
     for i in list_deleted:
         sql_req(func="del", file=i)
         del data_db[i]
-        logger.debug(f'Удален ключ {i} из data_db и database.db')
+        logger.debug(f"Удален ключ {i} из data_db и database.db")
 
-    logger.debug(f'Финальный data_db после очистки: {data_db}')
+    logger.debug(f"Финальный data_db после очистки: {data_db}")
     return data_db
+
 
 def path_generator(file):
     """
@@ -119,7 +127,7 @@ def path_generator(file):
         str: Полный путь к файлу.
     """
     path_file = os.path.join(DIR_PATH, file)
-    logger.debug(f'Сгенерирован путь к файлу {file}: {path_file}')
+    logger.debug(f"Сгенерирован путь к файлу {file}: {path_file}")
     return path_file
 
 
@@ -136,32 +144,29 @@ def update_file_time(file, data_disk):
     """
     now = datetime.datetime.now()
     data_disk[file] = now.strftime("%Y-%m-%d %H:%M:%S")
-    logger.debug(f'Обновлено время для файла {file}: {data_disk[file]}')
+    logger.debug(f"Обновлено время для файла {file}: {data_disk[file]}")
     return data_disk
-
-
-
 
 
 def infinite_loop():
     """
     Основной цикл программы, который отслеживает изменения в директории с файлами.
     """
-    logger.info('Начало infinite_loop')
+    logger.info("Начало infinite_loop")
     data_disk = {}
     attribute = Connector()
 
     while True:
-        logger.debug('Начало итерации цикла')
+        logger.debug("Начало итерации цикла")
         list_file = os.listdir(DIR_PATH)
         files_on_disk = attribute.info()
-        logger.debug(f'Файлы в директории: {list_file}')
-        logger.debug(f'Файлы на диске (attribute.info()): {files_on_disk}')
+        logger.debug(f"Файлы в директории: {list_file}")
+        logger.debug(f"Файлы на диске (attribute.info()): {files_on_disk}")
 
         # Обнаружение новых файлов
         for file in list_file:
             if file not in files_on_disk:
-                logger.info(f'Новый файл обнаружен: {file}')
+                logger.info(f"Новый файл обнаружен: {file}")
                 path_file = path_generator(file)
                 attribute.load(f_path=file, path_file=path_file)
                 data_disk = update_file_time(file, data_disk)
@@ -169,7 +174,7 @@ def infinite_loop():
         # Обнаружение удаленных файлов
         for file in files_on_disk:
             if file not in list_file:
-                logger.info(f'Файл удален: {file}')
+                logger.info(f"Файл удален: {file}")
                 attribute.delete(f_path=file)
 
         # Загрузка JSON данных
@@ -178,7 +183,7 @@ def infinite_loop():
         if data_db is None:
             data_db = {}
 
-        logger.debug(f'Текущий data_db: {data_db}')
+        logger.debug(f"Текущий data_db: {data_db}")
 
         # Проверка времени изменения файлов и обновление при необходимости
         for file in list_file:
@@ -186,15 +191,18 @@ def infinite_loop():
             last_modified_time = get_last_modified_time(path_file)
 
             if last_modified_time is not None:
-                if file in data_db and last_modified_time > data_db.get(file, ''):
-                    logger.info(f'Файл {file} нуждается в обновлении')
+                if file in data_db and last_modified_time > data_db.get(file, ""):
+                    logger.info(f"Файл {file} нуждается в обновлении")
                     attribute.reload(path_file=path_file, f_path=file)
-                    data_disk = update_file_time(file, data_disk)  # Обновляем время в data_disk
+                    data_disk = update_file_time(
+                        file, data_disk
+                    )  # Обновляем время в data_disk
                 else:
-                    logger.debug(f'Файл {file} не нуждается в обновлении или отсутствует в data_db')
+                    logger.debug(
+                        f"Файл {file} не нуждается в обновлении или отсутствует в data_db"
+                    )
             else:
-                logger.warning(f'Не удалось получить время изменения для файла: {file}')
-
+                logger.warning(f"Не удалось получить время изменения для файла: {file}")
 
         # Обновляем data_db новыми данными из data_disk
         if data_disk:
@@ -207,9 +215,9 @@ def infinite_loop():
         # Очищаем data_disk после сохранения в db
         data_disk = {}
 
-        logger.info('Конец итерации цикла')
+        logger.info("Конец итерации цикла")
         sleep(5)  # Используем time.sleep() для задержки
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     infinite_loop()
