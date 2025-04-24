@@ -58,22 +58,19 @@
 
     Создайте файл `.env` в корневой папке проекта со следующим содержимым, заменив значения на свои:
 
-    ```yaml
-    yandex_disk_token: "YOUR_YANDEX_DISK_TOKEN"
-    local_folder: "/path/to/your/local/folder"
-    remote_folder: "/path/to/your/remote/folder/on/yandexdisk"  # Относительно корневой папки Яндекс.Диска
-    sync_interval: 60  # Интервал синхронизации в секундах
-    exclude_patterns:
-      - ".*\.tmp$"
-      - ".*\.swp$"
-      - "node_modules/"
+    ```.env
+    API_KEY="YOUR_YANDEX_DISK_TOKEN"
+    DIR_PATH="/path/to/your/local/folder"
+    DISK_PATH="/path/to/your/remote/folder/on/yandexdisk"  # Относительно корневой папки Яндекс.Диска
+    URL="https://cloud-api.yandex.net/v1/disk/resources"
+    LOG_FILE="/path/to/your/log/folder"
     ```
 
-    *   `yandex_disk_token`:  Токен, полученный на предыдущем шаге.
-    *   `local_folder`:  Путь к локальной папке, которую нужно синхронизировать.
-    *   `remote_folder`:  Путь к папке на Яндекс.Диске, с которой будет происходить синхронизация.  (Например, `/MySyncFolder`).  Путь указывается относительно корневой папки вашего Яндекс.Диска.
-    *   `sync_interval`: Интервал в секундах, через который программа проверяет наличие изменений.
-    *   `exclude_patterns`:  Список регулярных выражений для исключения файлов и папок из синхронизации.
+    *   `API_KEY`:  Токен, полученный на предыдущем шаге.
+    *   `DIR_PATH`:  Путь к локальной папке, которую нужно синхронизировать.
+    *   `DISK_PATH`:  Путь к папке на Яндекс.Диске, с которой будет происходить синхронизация.  (Например, `/MySyncFolder`).  Путь указывается относительно корневой папки вашего Яндекс.Диска.
+    *   `URL`:  URL API Яндекс Диска - "https://cloud-api.yandex.net/v1/disk/resources"
+    *   `LOG_FILE`:  Путь к файлу логов (Например, `/log.json`)
 
 ## Запуск
 
