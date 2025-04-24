@@ -20,11 +20,17 @@
 
 *   Python 3.12
 *   Установленные библиотеки:
+    *   black==25.1.0
     *   certifi==2025.1.31
     *   charset-normalizer==3.4.1
+    *   click==8.1.8
     *   dotenv==0.9.9
     *   idna==3.10
     *   loguru==0.7.3
+    *   mypy_extensions==1.1.0
+    *   packaging==25.0
+    *   pathspec==0.12.1
+    *   platformdirs==4.3.7
     *   python-dotenv==1.1.0
     *   requests==2.32.3
     *   urllib3==2.4.0
