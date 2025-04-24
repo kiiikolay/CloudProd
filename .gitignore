@@ -1,4 +1,3 @@
-.gitignore
 .env
 env.copy2
 database.db
